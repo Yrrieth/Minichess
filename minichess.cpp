@@ -4,7 +4,7 @@
 
 using namespace std;
 
-class minichess {
+class Minichess {
 public:
 	char board [SIZE][SIZE];
 
@@ -56,14 +56,86 @@ public:
 			}
 		}
 	}
+
+	void move_pawn (char board[SIZE][SIZE], char piece) {
+		for (int i = 0; i < SIZE; i++) {
+			for (int j = 0; j < SIZE; j++) {
+				
+			}
+		}
+	}
+};
+
+class Piece {
+public:
+	char piece;
+	bool color;
+	int row;
+	int column;
+
+	Piece (char piece_t, bool color_t, int row_t, int column_t) {
+		piece = piece_t;
+		color = color_t;
+		row = row_t;
+		column = column_t;
+	};
+	~Piece() {};
+
+	char get_piece () {
+		return piece;
+	}
+
+	void set_piece (char piece_t) {
+		piece = piece_t;
+	}
+
+	bool get_color () {
+		return color;
+	}
+
+	void set_color (bool color_t) {
+		color = color_t;
+	}
+
+	int get_row () {
+		return row;
+	}
+
+	void set_row (int row_t) {
+		row = row_t;
+	}
+
+	int get_column () {
+		return column;
+	}
+
+	void set_column (int column_t) {
+		column = column_t;
+	}
 };
 
 int main () {
-	minichess m;
+	Minichess m;
 	char board[SIZE][SIZE];
+	Piece p('p', true, 4, 2);
+
+	int tmp = p.get_column();
+	std::cout << "La pièce est " << tmp << "\n";
+
+	Piece t('p', false, 4, 2);
+	t.set_piece('K');
+	t.set_color(true);
+	t.set_row(1);
+	t.set_column(3);
+
+	std::cout << t.get_piece() <<
+	t.get_color() <<
+	t.get_row() <<
+	t.get_column() << "\n";
 
 	m.create_board(board);
-	m.init_board(board);
+	//m.init_board(board);
+	m.add_piece(board, 'P', 4, 2);
 	m.print_board(board);
 
 	std::cout << "\n";
