@@ -1,144 +1,252 @@
-#include <iostream>
-#include <array>
-#define SIZE 5
+#include "minichess.hpp"
 
-using namespace std;
+void Minichess::create_board () {
+	for (int i = 0; i < SIZE; i++) {
+		for (int j = 0; j < SIZE; j++) {
+			_board[i][j] = '.';
+		}
+	}
+}
 
-class Minichess {
-public:
-	char board [SIZE][SIZE];
+void Minichess::init_board () {
+	char white_valuable_piece[SIZE] = {'R', 'B', 'N', 'Q', 'K'};
+	char black_valuable_piece[SIZE] = {'r', 'b', 'n', 'q', 'k'};
 
-	void create_board (char board[SIZE][SIZE]) {
-		for (int i = 0; i < SIZE; i++) {
-			for (int j = 0; j < SIZE; j++) {
-				board[i][j] = '.';
+	for (int i = 0; i < SIZE; i++) {
+		for (int j = 0; j < SIZE; j++) {
+			if (i == 0) {
+				_board[i][j] = black_valuable_piece[j];
+			}
+			if (i == 1) { // Black pawns
+				_board[i][j] = 'p';
+			}
+			if (i == SIZE - 2) { // White pawns
+				_board[i][j] = 'P';
+			}
+			if (i == SIZE - 1) {
+				_board[i][j] = white_valuable_piece[j];
 			}
 		}
 	}
+}
 
-	void init_board (char board[SIZE][SIZE]) {
-		char white_valuable_piece[SIZE] = {'R', 'B', 'N', 'Q', 'K'};
-		char black_valuable_piece[SIZE] = {'r', 'b', 'n', 'q', 'k'};
+void Minichess::print_board () {
+	for (int i = 0; i < SIZE; i++) {
+		for (int j = 0; j < SIZE; j++) {
+			std::cout << _board[i][j] << " ";
+		}
+		std::cout << "\n";
+	}
+}
 
-		for (int i = 0; i < SIZE; i++) {
-			for (int j = 0; j < SIZE; j++) {
-				if (i == 0) {
-					board[i][j] = black_valuable_piece[j];
-				}
-				if (i == 1) { // Black pawns
-					board[i][j] = 'p';
-				}
-				if (i == SIZE - 2) { // White pawns
-					board[i][j] = 'P';
-				}
-				if (i == SIZE - 1) {
-					board[i][j] = white_valuable_piece[j];
-				}
+void Minichess::add_piece (char piece, int row, int column) {
+	for (int i = 0; i < SIZE; i++) {
+		for (int j = 0; j < SIZE; j++) {
+			if (i == row && j == column) {
+				_board[i][j] = piece;
 			}
 		}
 	}
+}
 
-	void print_board (char board[SIZE][SIZE]) {
-		for (int i = 0; i < SIZE; i++) {
-			for (int j = 0; j < SIZE; j++) {
-				std::cout << board[i][j] << " ";
-			}
-			std::cout << "\n";
-		}
-	}
+int Minichess::pawn_attacks (int x, int y) {
+	int x_initial_position, y_initial_position;
+	char piece = _board[x][y];
 
-	void add_piece (char board[SIZE][SIZE], char piece, int row, int column) {
-		for (int i = 0; i < SIZE; i++) {
-			for (int j = 0; j < SIZE; j++) {
-				if (i == row && j == column) {
-					board[i][j] = piece;
+	if (_turn == true) {
+		x_initial_position = x;
+		y_initial_position = y;
+		if (x != 0 && y != SIZE - 1) { // Up/right
+			_board[x][y] = '.';
+			x -= 1;
+			y += 1;
+			if (is_free(x, y) == false) {
+				if (is_uppercase(_board[x][y]) == false) {
+					std::cout << "Le " << _board[x][y] << " en " << x << ","<< y << " est attaqué\n";
+					_board[x][y] = piece;
+					return 1;
 				}
 			}
 		}
-	}
 
-	void move_pawn (char board[SIZE][SIZE], char piece) {
-		for (int i = 0; i < SIZE; i++) {
-			for (int j = 0; j < SIZE; j++) {
-				
+		x = x_initial_position;
+		y = y_initial_position;
+		_board[x][y] = piece;
+
+		if (x != 0 && y != 0) { // Up/left
+			_board[x][y] = '.';
+			x -= 1;
+			y -= 1;
+			if (is_free(x, y) == false) {
+				if (is_uppercase(_board[x][y]) == false) {
+					std::cout << "Le " << _board[x][y] << " en " << x << ","<< y << " est attaqué\n";
+					_board[x][y] = piece;
+					return 1;
+				}
 			}
 		}
+		x = x_initial_position;
+		y = y_initial_position;
+		_board[x][y] = piece;
+	} else {
+		x_initial_position = x;
+		y_initial_position = y;
+		std::cout << "a\n";
+		if (x != SIZE - 1 && y != SIZE - 1) { // Down/right
+			_board[x][y] = '.';
+			x += 1;
+			y += 1;
+			if (is_free(x, y) == false) {
+				if (is_uppercase(_board[x][y]) == true) {
+					std::cout << "Le " << _board[x][y] << " en " << x << ","<< y << " est attaqué\n";
+					_board[x][y] = piece;
+					return 1;
+				}
+			}
+		}
+
+		x = x_initial_position;
+		y = y_initial_position;
+		_board[x][y] = piece;
+
+		std::cout << "b\n";
+		if (x != SIZE - 1 && y != 0) { // Down/left
+			_board[x][y] = '.';
+			std::cout << x << y << "\n";
+
+			x += 1;
+			y -= 1;
+			std::cout << x << y << "\n";
+			if (is_free(x, y) == false) {
+				std::cout << "d\n";
+				if (is_uppercase(_board[x][y]) == true) {
+					std::cout << "Le " << _board[x][y] << " en " << x << ","<< y << " est attaqué\n";
+					_board[x][y] = piece;
+					return 1;
+				}
+			}
+		}
+		x = x_initial_position;
+		y = y_initial_position;
+		_board[x][y] = piece;
 	}
-};
+	return 0;
+}
 
-class Piece {
-public:
-	char piece;
-	bool color;
-	int row;
-	int column;
+void Minichess::moves_pawn (int x, int y) {
+	int x_initial_position;
+	char piece = _board[x][y];
 
-	Piece (char piece_t, bool color_t, int row_t, int column_t) {
-		piece = piece_t;
-		color = color_t;
-		row = row_t;
-		column = column_t;
-	};
-	~Piece() {};
+	x_initial_position = x;
 
-	char get_piece () {
-		return piece;
+	if (pawn_attacks(x, y) == 0) { // If pawn can't attack
+		if (_turn == true && x != 0) { // Uppercase pawn moves
+			_board[x][y] = '.';
+			x += -1;
+			if (is_free(x, y) == true) {
+				std::cout << "MAJ C'EST LIBRE (¤_ ¤)\n";
+				_board[x][y] = piece;
+
+
+				//_board[x][y] = '.';
+			}
+		} else if (_turn == false && x != SIZE - 1) { // Lowercase pawn moves
+			_board[x][y] = '.';
+			x += 1;
+			if (is_free(x, y) == true) {
+				std::cout << "min c'est libre ('w ')\n";
+				_board[x][y] = piece;
+
+
+
+
+				//_board[x][y] = '.';
+			}
+		}
+		//x = x_initial_position;                        ENLEVER LES COMMENTAIRES ICI
+		//_board[x][y] = piece;
 	}
 
-	void set_piece (char piece_t) {
-		piece = piece_t;
-	}
+	
+}
 
-	bool get_color () {
-		return color;
-	}
+bool Minichess::is_free (int x, int y) {
+	if (_board[x][y] == '.') 
+		return true;
+	return false;
+}
 
-	void set_color (bool color_t) {
-		color = color_t;
-	}
+bool Minichess::is_uppercase (char piece) {
+	if (piece >= 65 && piece <= 90)
+		return true;
+	return false;
+}
 
-	int get_row () {
-		return row;
+void Minichess::select_piece () {
+	int i, j;
+	if (_turn == true) {
+		for (i = 0; i < SIZE; i++) {
+			for (j = 0; j < SIZE; j++) {
+				if (_board[i][j] == 'P') {
+					std::cout << "j(x) : " << j << ", i(y) : " << i << "\n";
+					moves_pawn(i, j);
+				}
+			}
+		}
+		_turn = false;
+	} else {
+		for (i = SIZE - 1; i >= 0; i--) {
+			for (j = 0; j < SIZE; j++) {
+				if (_board[i][j] == 'p') {
+					std::cout << "j(x) : " << j << ", i(y) : " << i << "\n";
+					moves_pawn(i, j);
+				}
+			}
+		}
+		_turn = true;
 	}
+	
+}
 
-	void set_row (int row_t) {
-		row = row_t;
+void Minichess::playout () {
+	int i = 0;
+	while (i < 5) {
+		std::cout << "Tour " << i << "\n";
+		select_piece ();
+		print_board();
+		i++;
 	}
+}
 
-	int get_column () {
-		return column;
-	}
-
-	void set_column (int column_t) {
-		column = column_t;
-	}
-};
 
 int main () {
 	Minichess m;
-	char board[SIZE][SIZE];
-	Piece p('p', true, 4, 2);
 
-	int tmp = p.get_column();
-	std::cout << "La pièce est " << tmp << "\n";
+	m._turn = false;
 
-	Piece t('p', false, 4, 2);
-	t.set_piece('K');
-	t.set_color(true);
-	t.set_row(1);
-	t.set_column(3);
+	m.create_board();
+	//m.init_board();
 
-	std::cout << t.get_piece() <<
-	t.get_color() <<
-	t.get_row() <<
-	t.get_column() << "\n";
+	//m.add_piece('k', 3, 2);
+	m.add_piece('p', 1, 2);
+	m.add_piece('p', 0, 2);
 
-	m.create_board(board);
-	//m.init_board(board);
-	m.add_piece(board, 'P', 4, 2);
-	m.print_board(board);
+	m.add_piece('P', 2, 1);
+	m.add_piece('P', 3, 0);
+	//m.add_piece('P', 4, 4);
+	//m.add_piece('K', 0, 4);
+
+	std::cout << "Position initiale\n";
+	m.print_board();
+
+	m.playout();
+
+	//m.select_piece();
+	//m.print_board();
+
 
 	std::cout << "\n";
+
 	
 	return 0;
 }
