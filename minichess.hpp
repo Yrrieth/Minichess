@@ -2,9 +2,28 @@
 #define MINICHESS_H_INCLUDED
 
 #include <iostream>
+#include <vector>
 #define SIZE 5
 
 using namespace std;
+
+class Piece {
+public:
+	Piece (char piece, int x, int y);
+	~Piece ();
+
+	char get_piece ();
+	void set_piece (char piece);
+	int get_x ();
+	void set_x (int x);
+	int get_y ();
+	void set_y (int y);
+
+private:
+	char _piece;
+	int _x;
+	int _y;
+};
 
 class Minichess {
 public:
@@ -21,8 +40,7 @@ public:
 	bool is_uppercase (char piece);
 	void select_piece ();
 	void playout ();
+	void number_piece (std::vector<Piece> &v);
 };
-
-int test();
 
 #endif // MINICHESS_H_INCLUDED

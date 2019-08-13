@@ -1,5 +1,5 @@
 CXX=g++
-SRC=minichess.cpp
+SRC=minichess.cpp piece.cpp
 OBJ=$(SRC:.c=.o)
 CXXFLAGS=-O3 -std=c++14 -Wall
 

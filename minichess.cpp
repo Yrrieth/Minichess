@@ -218,15 +218,37 @@ void Minichess::playout () {
 	}
 }
 
+void Minichess::number_piece (std::vector<Piece> &vector_piece) {
+	int i, j;
+	for (i = 0; i < SIZE; i++) {
+		for (j = 0; j < SIZE; j++) {
+			if (_board[i][j] != '.') {
+				Piece current_piece(_board[i][j], i, j);
+				vector_piece.push_back(current_piece);
+			}
+		}
+	}
+
+	std::cout << "Nombre de pièces totales : "<< vector_piece.size() << "\n";
+	
+	if (vector_piece.size() > 0) {
+		for (i = 0; i < (int)vector_piece.size(); i++) {
+			std::cout << vector_piece[i].get_piece() << vector_piece[i].get_x() << vector_piece[i].get_y() << "\n";
+		}
+	}
+}
+
 
 int main () {
-	Minichess m;
+	/*Minichess m;
 
-	m._turn = false;
+	m._turn = true;
 
 	m.create_board();
 	//m.init_board();
 
+	Piece p ('P', 3, 0);
+	std::cout << p.get_piece() << p.get_x() << p.get_y() << "\n";
 	//m.add_piece('k', 3, 2);
 	m.add_piece('p', 1, 2);
 	m.add_piece('p', 0, 2);
@@ -243,6 +265,52 @@ int main () {
 
 	//m.select_piece();
 	//m.print_board();
+	*/
+
+///////////////////////////////////////////////////////////////////:
+	Minichess m;
+
+	m._turn = true;
+
+	m.create_board();
+	//m.init_board();
+
+	//Piece p ('P', 3, 0);
+	//std::cout << p.get_piece() << p.get_x() << p.get_y() << "\n";
+	//m.add_piece('k', 3, 2);
+	//m.add_piece('p', 1, 2);
+	m.add_piece('p', 0, 2);
+
+	//m.add_piece('P', 2, 1);
+	m.add_piece('P', 3, 0);
+	//m.add_piece('P', 4, 4);
+	//m.add_piece('K', 0, 4);
+
+	std::cout << "Position initiale\n";
+	m.print_board();
+
+	//m.playout();
+
+	//m.select_piece();
+	//m.print_board();
+	Piece p ('P', 0, 0);
+	std::cout << p.get_piece() << p.get_x() << p.get_y() << "\n";
+
+	int const number_piece = 20;
+	std::vector<Piece> vector_piece;
+
+	m.number_piece(vector_piece);
+
+	
+	std::cout << "Nombre de pièces totales : "<< vector_piece.size() << "\n";
+	
+	if (vector_piece.size() > 0) {
+		for (int i = 0; i < (int)vector_piece.size(); i++) {
+			std::cout << vector_piece[i].get_piece() << vector_piece[i].get_x() << vector_piece[i].get_y() << "\n";
+		}
+	}
+	
+	
 
 
 	std::cout << "\n";
