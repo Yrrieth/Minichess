@@ -36,8 +36,13 @@ public:
 	void add_piece (char piece, int row, int column);
 	bool is_ennemy(char piece, int x, int y);
 
+	int bishop_attacks (int x, int y);
+	void moves_bishop (int x, int y);
+
 	int rook_attacks (int x, int y);
 	void moves_rook (int x, int y);
+
+	void moves_queen (int x, int y);
 
 	int pawn_attacks (int x, int y);
 	void moves_pawn (int x, int y);

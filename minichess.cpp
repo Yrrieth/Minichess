@@ -73,6 +73,223 @@ bool Minichess::is_ennemy (char piece, int x, int y) {
 	return 0;
 }
 
+int Minichess::bishop_attacks (int x, int y) {
+	int x_initial_position, y_initial_position;
+	char piece = _board[x][y];
+
+		x_initial_position = x;
+		y_initial_position = y;
+		while (x != 0 && y != SIZE - 1) { // Up/right
+			_board[x][y] = '.';
+			x -= 1;
+			y += 1;
+			if (square_is_free(x, y) == false) {
+				if (_turn == true) {
+					if (is_uppercase(_board[x][y]) == false) {
+						std::cout << "Le " << _board[x][y] << " en " << x << ","<< y << " est attaqué\n";
+						_board[x][y] = piece;
+						return 1;	
+					} else {
+						break;
+					}
+				} 
+				if (_turn == false) {
+					if (is_uppercase(_board[x][y]) == true) {
+						std::cout << "Le " << _board[x][y] << " en " << x << ","<< y << " est attaqué\n";
+						_board[x][y] = piece;
+						return 1;
+					} else {
+						break;
+					}
+				}
+			}
+		}
+
+		x = x_initial_position;
+		y = y_initial_position;
+		_board[x][y] = piece;
+
+		while (x != SIZE - 1 && y != SIZE - 1) { // right/down
+			_board[x][y] = '.';
+			x += 1;
+			y += 1;
+			if (square_is_free(x, y) == false) {
+				if (_turn == true) {
+					if (is_uppercase(_board[x][y]) == false) {
+						std::cout << "Le " << _board[x][y] << " en " << x << ","<< y << " est attaqué\n";
+						_board[x][y] = piece;
+						return 1;	
+					} else {
+						break;
+					}
+				} 
+				if (_turn == false) {
+					if (is_uppercase(_board[x][y]) == true) {
+						std::cout << "Le " << _board[x][y] << " en " << x << ","<< y << " est attaqué\n";
+						_board[x][y] = piece;
+						return 1;
+					} else {
+						break;
+					}
+				}
+			}
+		}
+
+		x = x_initial_position;
+		y = y_initial_position;
+		_board[x][y] = piece;
+
+		while (x != SIZE - 1 && y != 0) { // down/left
+			_board[x][y] = '.';
+			x += 1;
+			y -= 1;
+			if (square_is_free(x, y) == false) {
+				if (_turn == true) {
+					if (is_uppercase(_board[x][y]) == false) {
+						std::cout << "Le " << _board[x][y] << " en " << x << ","<< y << " est attaqué\n";
+						_board[x][y] = piece;
+						return 1;	
+					} else {
+						break;
+					}
+				} 
+				if (_turn == false) {
+					if (is_uppercase(_board[x][y]) == true) {
+						std::cout << "Le " << _board[x][y] << " en " << x << ","<< y << " est attaqué\n";
+						_board[x][y] = piece;
+						return 1;
+					} else {
+						break;
+					}
+				} 
+			}
+		}
+
+		x = x_initial_position;
+		y = y_initial_position;
+		_board[x][y] = piece;
+
+		while (x != 0 && y != 0) { // left/up
+			_board[x][y] = '.';
+			x -= 1;
+			y -= 1;
+			if (square_is_free(x, y) == false) {
+				if (_turn == true) {
+					if (is_uppercase(_board[x][y]) == false) {
+						std::cout << "Le " << _board[x][y] << " en " << x << ","<< y << " est attaqué\n";
+						_board[x][y] = piece;
+						return 1;	
+					} else {
+						break;
+					}
+				} 
+				if (_turn == false) {
+					if (is_uppercase(_board[x][y]) == true) {
+						std::cout << "Le " << _board[x][y] << " en " << x << ","<< y << " est attaqué\n";
+						_board[x][y] = piece;
+						return 1;
+					} else {
+						break;
+					}
+				}
+			}
+		}
+		x = x_initial_position;
+		y = y_initial_position;
+		_board[x][y] = piece;
+
+	return 0;
+}
+
+void Minichess::moves_bishop (int x, int y) {
+	int x_initial_position, y_initial_position;
+	char piece = _board[x][y];
+
+	x_initial_position = x;
+	y_initial_position = y;
+	std::cout << "ICI en x : " << x << ", y : " << y << "\n";
+	std::cout << "ICI en x_initial_position : " << x_initial_position << ", y_initial_position : " << y_initial_position << "\n";
+
+	if (bishop_attacks(x, y) == 0) { // If rook can't attack
+		std::cout << "A\n";
+		while (x != 0 && y != SIZE - 1) { // Moves up/right
+			_board[x][y] = '.';
+			x -= 1;
+			y += 1;
+			if (square_is_free(x, y) == true) {
+				std::cout << "MAJ C'EST LIBRE (¤_ ¤)\n";
+				_board[x][y] = piece;
+				print_board();
+				bishop_attacks(x, y);
+
+				_board[x][y] = '.';
+			}
+		}
+				std::cout << _board[x][y] << " en x : " << x << ", y : " << y << "\n";
+
+		x = x_initial_position;
+		y = y_initial_position;
+		std::cout << "B\n";
+				std::cout << _board[x][y] << " en x : " << x << ", y : " << y << "\n";
+
+
+		while (x != SIZE - 1 && y != SIZE - 1) { // Moves right/down
+			_board[x][y] = '.';
+			x += 1;
+			y += 1;
+			std::cout << _board[x][y] << " en x : " << x << ", y : " << y << "\n";
+			if (square_is_free(x, y) == true) {
+				std::cout << "MAJ C'EST LIBRE (¤_ ¤)\n";
+				_board[x][y] = piece;
+				print_board();
+				bishop_attacks(x, y);
+
+				_board[x][y] = '.';
+			}
+		}
+
+		x = x_initial_position;
+		y = y_initial_position;
+		std::cout << "C\n";
+		while (x != SIZE - 1 && y != 0) { // Moves down/left
+			_board[x][y] = '.';
+			x += 1;
+			y -= 1;
+			if (square_is_free(x, y) == true) {
+				std::cout << "MAJ C'EST LIBRE (¤_ ¤)\n";
+				_board[x][y] = piece;
+				print_board();
+				bishop_attacks(x, y);
+
+
+				_board[x][y] = '.';
+			}
+		}
+
+		x = x_initial_position;
+		y = y_initial_position;
+		std::cout << "D\n";
+		while (x != 0 && y != 0) { // Moves left/up
+			_board[x][y] = '.';
+			x -= 1;
+			y -= 1;
+			if (square_is_free(x, y) == true) {
+				std::cout << "MAJ C'EST LIBRE (¤_ ¤)\n";
+				_board[x][y] = piece;
+				print_board();
+				bishop_attacks(x, y);
+
+
+				_board[x][y] = '.';
+			}
+		}
+
+		x = x_initial_position;
+		y = y_initial_position;
+		_board[x][y] = piece;
+	}
+}
+
 int Minichess::rook_attacks (int x, int y) {
 	int x_initial_position, y_initial_position;
 	char piece = _board[x][y];
@@ -132,6 +349,7 @@ int Minichess::rook_attacks (int x, int y) {
 				}
 			}
 		}
+
 		x = x_initial_position;
 		y = y_initial_position;
 		_board[x][y] = piece;
@@ -193,8 +411,6 @@ int Minichess::rook_attacks (int x, int y) {
 		y = y_initial_position;
 		_board[x][y] = piece;
 
-
-	
 	return 0;
 }
 
@@ -204,7 +420,6 @@ void Minichess::moves_rook (int x, int y) {
 
 	x_initial_position = x;
 	y_initial_position = y;
-	std::cout << "ICI\n";
 
 	if (rook_attacks(x, y) == 0) { // If rook can't attack
 
@@ -259,7 +474,7 @@ void Minichess::moves_rook (int x, int y) {
 
 		while (y != 0) { // Moves left
 			_board[x][y] = '.';
-			y += -1;
+			y -= 1;
 			if (square_is_free(x, y) == true) {
 				std::cout << "MAJ C'EST LIBRE (¤_ ¤)\n";
 				_board[x][y] = piece;
@@ -275,6 +490,11 @@ void Minichess::moves_rook (int x, int y) {
 		y = y_initial_position;
 		_board[x][y] = piece;
 	}
+}
+
+void Minichess::moves_queen (int x, int y) {
+	moves_rook(x, y);
+	moves_bishop(x, y);
 }
 
 int Minichess::pawn_attacks (int x, int y) {
@@ -420,12 +640,20 @@ void Minichess::select_piece () {
 		for (i = 0; i < SIZE; i++) {
 			for (j = 0; j < SIZE; j++) {
 				if (_board[i][j] == 'P') {
-					std::cout << _board[i][j] << " en j(x) : " << j << ", i(y) : " << i << "\n";
+					std::cout << _board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
 					moves_pawn(i, j);
 				}
-				if (_board[i][j] == 'T') {
-					std::cout << _board[i][j] << " en j(x) : " << j << ", i(y) : " << i << "\n";
+				if (_board[i][j] == 'R') {
+					std::cout << _board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
 					moves_rook(i, j);
+				}
+				if (_board[i][j] == 'B') {
+					std::cout << _board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
+					moves_bishop(i, j);
+				}
+				if (_board[i][j] == 'Q') {
+					std::cout << _board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
+					moves_queen(i, j);
 				}
 			}
 		}
@@ -434,8 +662,16 @@ void Minichess::select_piece () {
 		for (i = SIZE - 1; i >= 0; i--) {
 			for (j = 0; j < SIZE; j++) {
 				if (_board[i][j] == 'p') {
-					std::cout << "j(x) : " << j << ", i(y) : " << i << "\n";
+					std::cout << _board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
 					moves_pawn(i, j);
+				}
+				if (_board[i][j] == 'r') {
+					std::cout << _board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
+					moves_rook(i, j);
+				}
+				if (_board[i][j] == 'b') {
+					std::cout << _board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
+					moves_bishop(i, j);
 				}
 			}
 		}
@@ -515,13 +751,14 @@ int main () {
 	//std::cout << p.get_piece() << p.get_x() << p.get_y() << "\n";
 	//m.add_piece('k', 3, 2);
 	//m.add_piece('p', 1, 2);
-	m.add_piece('p', 0, 3);
+	//m.add_piece('p', 1, 0);
+	m.add_piece('p', 0, 1);
 
 	//m.add_piece('P', 1, 2);
-	m.add_piece('T', 2, 2);
+	m.add_piece('Q', 3, 2);
 
 	//m.add_piece('P', 4, 4);
-	m.add_piece('K', 3, 3);
+	m.add_piece('K', 3, 4);
 
 	std::cout << "Position initiale\n";
 	m.print_board();
@@ -529,7 +766,7 @@ int main () {
 	//m.playout();
 
 	m.select_piece();
-	m.print_board();
+	//m.print_board();
 
 
 ///////////////////
