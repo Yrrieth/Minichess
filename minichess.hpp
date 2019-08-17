@@ -36,6 +36,9 @@ public:
 	void add_piece (char piece, int row, int column);
 	bool is_ennemy(char piece, int x, int y);
 
+	int knight_attacks (int x, int y);
+	void moves_knight (int x, int y);
+
 	int bishop_attacks (int x, int y);
 	void moves_bishop (int x, int y);
 
