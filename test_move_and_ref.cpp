@@ -94,7 +94,7 @@ int main () {
 	
 	print_board(tree->_board);
 
-	/** On utilise std::move pour "déplacer" et non envoyer une copie de l'objet
+	/** On utilise std::move pour "déplacer" l'objet et non envoyer une copie de l'objet
 	 *  car sinon, les allocations dans tree->next_ seront détruites 
 	 *  à la fin de la fonction allocate_next()
 	 */
