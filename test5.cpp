@@ -2,7 +2,7 @@
 #include <vector>
 #include <memory>
 #include <map>
-#define SIZE 5
+#define SIZE 3
 #define INF 1000
 
 /**
@@ -41,7 +41,7 @@ void print_board (char board[SIZE][SIZE]) {
 	std::cout << "\n";
 }
 
-void init_board (char board[SIZE][SIZE]) {
+/*void init_board (char board[SIZE][SIZE]) {
 	char white_valuable_piece[SIZE] = {'R', 'N', 'B', 'Q', 'K'};
 	char black_valuable_piece[SIZE] = {'r', 'n', 'b', 'q', 'k'};
 
@@ -61,7 +61,7 @@ void init_board (char board[SIZE][SIZE]) {
 			}
 		}
 	}
-}
+}*/
 
 /*std::unique_ptr<Node> allocate_next (std::unique_ptr<Node> tree) {
 	int i;
@@ -1283,7 +1283,7 @@ int select_piece (std::unique_ptr<Node>& tree, int i, int j, int& number_move, b
 			}
 		}
 		std::cout << tree->_value << "\n";
-		turn = false;
+		//turn = false;
 	} else {
 		
 		if (tree->_board[i][j] == 'p') {
@@ -1314,7 +1314,7 @@ int select_piece (std::unique_ptr<Node>& tree, int i, int j, int& number_move, b
 		}
 	
 		std::cout << tree->_value << "\n";
-		turn = true;
+		//turn = true;
 	}
 }
 
@@ -1335,25 +1335,31 @@ int alphabeta (std::unique_ptr<Node>& tree, int number_move, bool turn, int dept
 	int res = 0;
 	//number_move = 0;
 
-	if (depth == 0)
-		return 0;
 
-	if (tree) {
+	if (depth == 0) {
+		return 0;
+	}
+
+	//if (tree) {
 		if (turn == false) { // Lowercase - alpha
 			res = INF;
 			for (i = 0; i < SIZE; i++) {
 				for (j = 0; j < SIZE; j++) {
 					if (tree->_board[i][j] != '.') {
 						select_piece (tree, i, j, number_move, turn);
-						for (k = 0; k < number_move; k++)
-							res = min(res, alphabeta(tree->_next[number_move], number_move, turn, depth - 1, alpha, beta));
-
-						if (alpha >= res) {
-							return res;
-						}
-						beta = min(beta, res);
 					}
 				}
+			}
+			//for (k = 0; k < number_move; k++) { 
+			for (k = 0; k < static_cast<int>(tree->_next.size()); k++) {
+				std::cout << "EST CE QUE JE PASSE ICI ???\n";
+				res = min(res, alphabeta(tree->_next[k], 0, true, depth - 1, alpha, beta));
+			
+				if (alpha >= res) {
+					return res;
+				}
+				beta = min(beta, res);
+				return beta;
 			}
 
 		} else {  // Uppercase - beta
@@ -1362,18 +1368,29 @@ int alphabeta (std::unique_ptr<Node>& tree, int number_move, bool turn, int dept
 				for (j = 0; j < SIZE; j++) {
 					if (tree->_board[i][j] != '.') {
 						select_piece (tree, i, j, number_move, turn);
-						for (k = 0; k < number_move; k++)
-							res = max(res, alphabeta(tree->_next[number_move], number_move, turn, depth - 1, alpha, beta));
-
-						if (res >= beta) {
-							return res;
-						}
-						alpha = max(alpha, res);
 					}
 				}
 			}
+			if (!tree->_board[0]) {
+				std::cout << "SOUS NOEUD VIDE\n";
+			} else {
+				std::cout << "SOUS NOEUD NON VIDE\n";
+				//print_board(tree->_next[0]->_board);
+			}
+			
+			//for (k = 0; k < number_move; k++) {
+			for (k = 0; k < static_cast<int>(tree->_next.size()); k++) {
+				std::cout << "PROFONDEUR : " << depth << "\n";
+
+				res = max(res, alphabeta(tree->_next[k], 0, false, depth - 1, alpha, beta));
+				std::cout << "RES : " << res << "\n";
+				if (res >= beta) {
+					return res;
+				}
+				alpha = max(alpha, res);
+			}
 		}
-	}
+	//}
 
 	
 
@@ -1396,21 +1413,28 @@ void print_node (std::unique_ptr<Node>& tree) {
 }
 
 int main () {
-	std::unique_ptr<Node> tree = std::make_unique<Node> ();
+	std::unique_ptr<Node> tree;
+	if (!tree) {
+		std::cout << "tree is empty\n";
+	}
+	tree = std::make_unique<Node> ();
+	if (tree) {
+		std::cout << "tree is not empty\n";
+	}
 	//tree->_next.push_back(std::make_unique<Node> ());
 	//tree->_next[0] = nullptr;
 
-	bool turn = false;
+	bool turn = true;
 
 	create_board(tree->_board);
 
 	//init_board(tree->_board);
 
-	add_piece(tree->_board, 'R', 4, 0);
-	add_piece(tree->_board, 'R', 3, 1);
+	add_piece(tree->_board, 'R', 1, 0);
+	add_piece(tree->_board, 'b', 2, 1);
 	
 	//add_piece(tree->_board, 'p', 1, 3);
-	add_piece(tree->_board, 'k', 0, 4);
+	add_piece(tree->_board, 'n', 0, 1);
 	//add_piece(tree->_board, 'K', 3, 1);
 	//add_piece(tree->_board, 'R', 4, 1);
 
@@ -1419,7 +1443,7 @@ int main () {
 	std::cout << "DEBUT DE LA SELECTION\n";
 	//tree->_value = calculate_value_board(tree);
 	//select_piece(tree, turn);
-	alphabeta(tree, 0, turn, 1, -INF, INF);
+	int res = alphabeta(tree, 0, turn, 3, -INF, INF);
 
 	std::cout << "///////////////////////////////////////\nDEBUT DU PRINT NODE\n";
 
@@ -1430,6 +1454,8 @@ int main () {
 		tree->_value = calculate_value_board(tree);
 		print_board(tree->_board);
 	}
+
+	std::cout << "Résultat : " << res << "\n";
 
 	/*std::cout << tree->_next.size() << "\n";
 	create_board(tree->_next[0]->_board);
