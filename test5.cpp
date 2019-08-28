@@ -2,7 +2,7 @@
 #include <vector>
 #include <memory>
 #include <map>
-#define SIZE 3
+#define SIZE 5
 #define INF 1000
 
 /**
@@ -16,9 +16,9 @@ public:
 	std::vector<std::unique_ptr<Node>> _next;
 
 	Node () {
-		std::cout << "Allocation\n";
+		//std::cout << "Allocation\n";
 	};
-	~Node () {std::cout << "Désallocation\n";};
+	~Node () {/*std::cout << "Désallocation\n";*/};
 };
 
 void create_board (char board[SIZE][SIZE]) {
@@ -41,7 +41,7 @@ void print_board (char board[SIZE][SIZE]) {
 	std::cout << "\n";
 }
 
-/*void init_board (char board[SIZE][SIZE]) {
+void init_board (char board[SIZE][SIZE]) {
 	char white_valuable_piece[SIZE] = {'R', 'N', 'B', 'Q', 'K'};
 	char black_valuable_piece[SIZE] = {'r', 'n', 'b', 'q', 'k'};
 
@@ -61,21 +61,21 @@ void print_board (char board[SIZE][SIZE]) {
 			}
 		}
 	}
-}*/
+}
 
-/*std::unique_ptr<Node> allocate_next (std::unique_ptr<Node> tree) {
+void initialized_next_nullptr (std::unique_ptr<Node>& tree) {
 	int i;
 	for (i = 0; i < SIZE * SIZE; i++) {
-		tree->_next.push_back(std::make_unique<Node> ());
+		tree->_next.push_back(nullptr);
 	}
-	return std::move(tree);
-}*/
+}
 
 void allocate_node (std::unique_ptr<Node>& tree, int number_move) {
 	int i;
 	for (i = 0; i < SIZE * SIZE; i++) {
-		if (i == number_move)
-			tree->_next.push_back(std::make_unique<Node> ());
+		if (i == number_move) {
+			tree->_next[i] = std::make_unique<Node> ();
+		}
 	}
 }
 
@@ -113,10 +113,9 @@ void copy_tab (std::unique_ptr<Node>& node_child, std::unique_ptr<Node>& parent)
 	}
 }
 
-bool is_ennemy (char board[SIZE][SIZE], int x, int y, bool turn) {
+bool is_enemy (char board[SIZE][SIZE], int x, int y, bool turn) {
 	if (turn == true) {
 		if (is_uppercase(board[x][y]) == -1) {
-			std::cout << "Le " << board[x][y] << " en " << x << ","<< y << " est attaqué\n";
 			return 1;	
 		} else {
 			return 0;
@@ -124,7 +123,6 @@ bool is_ennemy (char board[SIZE][SIZE], int x, int y, bool turn) {
 	} else 
 	if (turn == false) {
 		if (is_uppercase(board[x][y]) == 1) {
-			std::cout << "Le " << board[x][y] << " en " << x << ","<< y << " est attaqué\n";
 			return 1;
 		} else {
 			return 0;
@@ -150,7 +148,6 @@ int calculate_value_board (std::unique_ptr<Node>& tree) {
 			}
 		}
 	}
-	std::cout << "SCORE EVALUATION : "<< score_evaluation << "\n";
 	return score_evaluation;
 }
 
@@ -159,12 +156,12 @@ int calculate_value_board (std::unique_ptr<Node>& tree) {
  */
 
 int move_piece (std::unique_ptr<Node>& tree, char piece, int x, int y, int& number_move, bool& turn) {
-	char ennemy_piece;
+	char enemy_piece;
 
 	if (square_is_free(tree->_board, x, y) == true) { // If the square in x, y is free
 		tree->_board[x][y] = piece;
 		allocate_node(tree, number_move);
-		print_board(tree->_board);
+		//print_board(tree->_board);
 		tree->_value = calculate_value_board(tree);
 		tree->_next[number_move]->_value = calculate_value_board(tree);
 		
@@ -172,19 +169,19 @@ int move_piece (std::unique_ptr<Node>& tree, char piece, int x, int y, int& numb
 		number_move++;
 		tree->_board[x][y] = '.';
 	} else {
-		if (is_ennemy(tree->_board, x, y, turn) == 1) { // If the square contains an ennemy piece
+		if (is_enemy(tree->_board, x, y, turn) == 1) { // If the square contains an enemy piece
 			if (tree->_board[x][y] == 'k' || tree->_board[x][y] == 'K') // A piece can't "eat" a king
 				return 1;
-			ennemy_piece = tree->_board[x][y];
+			enemy_piece = tree->_board[x][y];
 			tree->_board[x][y] = piece;
 			allocate_node(tree, number_move);
-			print_board(tree->_board);
+			//print_board(tree->_board);
 			tree->_value = calculate_value_board(tree);
 			tree->_next[number_move]->_value = calculate_value_board(tree);
 			
 			copy_tab(tree->_next[number_move], tree);
 			number_move++;
-			tree->_board[x][y] = ennemy_piece;
+			tree->_board[x][y] = enemy_piece;
 			return 1;
 		} else {
 			return -1;
@@ -221,7 +218,6 @@ int bishop_attacks_king (std::unique_ptr<Node>& tree, int x, int y, int& number_
 	while (x != SIZE - 1 && y != SIZE - 1) { // Moves right/down
 		x += 1;
 		y += 1;
-		std::cout << tree->_board[x][y] << " en x : " << x << ", y : " << y << "\n";
 		if (square_is_free(tree->_board, x, y) == false) {
 			if (turn == true) {
 				if (tree->_board[x][y] == 'b' || tree->_board[x][y] == 'q')
@@ -303,7 +299,6 @@ int moves_bishop (std::unique_ptr<Node>& tree, int x, int y, int& number_move, b
 		tree->_board[x][y] = '.';
 		x += 1;
 		y += 1;
-		std::cout << tree->_board[x][y] << " en x : " << x << ", y : " << y << "\n";
 		res_move_piece = move_piece(tree, piece, x, y, number_move, turn);
 		if (res_move_piece == 1 || res_move_piece == -1)
 			break;
@@ -492,10 +487,7 @@ int knight_attacks_king (std::unique_ptr<Node>& tree, int x, int y, int& number_
 
 	x_initial_position = x;
 	y_initial_position = y;
-	std::cout << "ICI en x : " << x << ", y : " << y << "\n";
-	std::cout << "ICI en x_initial_position : " << x_initial_position << ", y_initial_position : " << y_initial_position << "\n";
 
-	std::cout << "A\n";
 	if (x > 1 && y < SIZE - 1) { // Moves 2*up/1*right
 		x -= 2;
 		y += 1;
@@ -512,8 +504,6 @@ int knight_attacks_king (std::unique_ptr<Node>& tree, int x, int y, int& number_
 
 	x = x_initial_position;
 	y = y_initial_position;
-	std::cout << "B\n";
-	std::cout << tree->_board[x][y] << " en x : " << x << ", y : " << y << "\n";
 
 	if (x != 0 && y < SIZE - 2) { // Moves 1*up/2*right
 		x -= 1;
@@ -535,7 +525,6 @@ int knight_attacks_king (std::unique_ptr<Node>& tree, int x, int y, int& number_
 	if (x != SIZE - 1 && y < SIZE - 2) { // Moves 2*right/1*down
 		x += 1;
 		y += 2;
-		std::cout << tree->_board[x][y] << " en x : " << x << ", y : " << y << "\n";
 		if (square_is_free(tree->_board, x, y) == false) {
 			if (turn == true) {
 				if (tree->_board[x][y] == 'n')
@@ -553,7 +542,6 @@ int knight_attacks_king (std::unique_ptr<Node>& tree, int x, int y, int& number_
 	if (x < SIZE - 2 && y != SIZE - 1) { // Moves 1*right/2*down
 		x += 2;
 		y += 1;
-		std::cout << tree->_board[x][y] << " en x : " << x << ", y : " << y << "\n";
 		if (square_is_free(tree->_board, x, y) == false) {
 			if (turn == true) {
 				if (tree->_board[x][y] == 'n')
@@ -568,7 +556,6 @@ int knight_attacks_king (std::unique_ptr<Node>& tree, int x, int y, int& number_
 	x = x_initial_position;
 	y = y_initial_position;
 
-	std::cout << "C\n";
 	if (x < SIZE - 2 && y != 0) { // Moves 2*down/1*left
 		x += 2;
 		y -= 1;
@@ -603,7 +590,6 @@ int knight_attacks_king (std::unique_ptr<Node>& tree, int x, int y, int& number_
 	x = x_initial_position;
 	y = y_initial_position;
 
-	std::cout << "D\n";
 	if (x != 0 && y > 1) { // Moves 2*left/1*up
 		x -= 1;
 		y -= 2;
@@ -646,10 +632,7 @@ int moves_knight (std::unique_ptr<Node>& tree, int x, int y, int& number_move, b
 
 	x_initial_position = x;
 	y_initial_position = y;
-	std::cout << "ICI en x : " << x << ", y : " << y << "\n";
-	std::cout << "ICI en x_initial_position : " << x_initial_position << ", y_initial_position : " << y_initial_position << "\n";
 
-	std::cout << "A\n";
 	if (x > 1 && y < SIZE - 1) { // Moves 2*up/1*right
 		tree->_board[x][y] = '.';
 		x -= 2;
@@ -659,8 +642,6 @@ int moves_knight (std::unique_ptr<Node>& tree, int x, int y, int& number_move, b
 
 	x = x_initial_position;
 	y = y_initial_position;
-	std::cout << "B\n";
-	std::cout << tree->_board[x][y] << " en x : " << x << ", y : " << y << "\n";
 
 	if (x != 0 && y < SIZE - 2) { // Moves 1*up/2*right
 		tree->_board[x][y] = '.';
@@ -676,7 +657,6 @@ int moves_knight (std::unique_ptr<Node>& tree, int x, int y, int& number_move, b
 		tree->_board[x][y] = '.';
 		x += 1;
 		y += 2;
-		std::cout << tree->_board[x][y] << " en x : " << x << ", y : " << y << "\n";
 		move_piece(tree, piece, x, y, number_move, turn);
 	}
 
@@ -687,14 +667,12 @@ int moves_knight (std::unique_ptr<Node>& tree, int x, int y, int& number_move, b
 		tree->_board[x][y] = '.';
 		x += 2;
 		y += 1;
-		std::cout << tree->_board[x][y] << " en x : " << x << ", y : " << y << "\n";
 		move_piece(tree, piece, x, y, number_move, turn);
 	}
 
 	x = x_initial_position;
 	y = y_initial_position;
 
-	std::cout << "C\n";
 	if (x < SIZE - 2 && y != 0) { // Moves 2*down/1*left
 		tree->_board[x][y] = '.';
 		x += 2;
@@ -715,7 +693,6 @@ int moves_knight (std::unique_ptr<Node>& tree, int x, int y, int& number_move, b
 	x = x_initial_position;
 	y = y_initial_position;
 
-	std::cout << "D\n";
 	if (x != 0 && y > 1) { // Moves 2*left/1*up
 		tree->_board[x][y] = '.';
 		x -= 1;
@@ -813,11 +790,11 @@ int moves_pawn (std::unique_ptr<Node>& tree, int x, int y, int& number_move, boo
 
 	if (turn == true && x != 0) { // Uppercase pawn moves
 		tree->_board[x][y] = '.';
-		if (is_ennemy(tree->_board, x - 1, y + 1, turn) == 1 && tree->_board[x - 1][y - 1] != 'k' && y != SIZE - 1) { // Priority to attack up/right before to move
+		if (is_enemy(tree->_board, x - 1, y + 1, turn) == 1 && tree->_board[x - 1][y - 1] != 'k' && y != SIZE - 1) { // Priority to attack up/right before to move
 			move_piece(tree, piece, x - 1, y + 1, number_move, turn);
 		}
 
-		if (is_ennemy(tree->_board, x - 1, y - 1, turn) == 1 && tree->_board[x - 1][y - 1] != 'k' && y != 0) { // Priority to attack up/left before to move
+		if (is_enemy(tree->_board, x - 1, y - 1, turn) == 1 && tree->_board[x - 1][y - 1] != 'k' && y != 0) { // Priority to attack up/left before to move
 			move_piece(tree, piece, x - 1, y - 1, number_move, turn);
 		}
 
@@ -827,11 +804,11 @@ int moves_pawn (std::unique_ptr<Node>& tree, int x, int y, int& number_move, boo
 		}
 	} else if (turn == false && x != SIZE - 1) { // Lowercase pawn moves
 		tree->_board[x][y] = '.';
-		if (is_ennemy(tree->_board, x + 1, y + 1, turn) == 1 && tree->_board[x + 1][y + 1] != 'K' && y != SIZE - 1) { // Priority to attack down/right before to move
+		if (is_enemy(tree->_board, x + 1, y + 1, turn) == 1 && tree->_board[x + 1][y + 1] != 'K' && y != SIZE - 1) { // Priority to attack down/right before to move
 			move_piece(tree, piece, x + 1, y + 1, number_move, turn);
 		}
 
-		if (is_ennemy(tree->_board, x + 1, y - 1, turn) == 1 && tree->_board[x + 1][y - 1] != 'K' && y != 0) { // Priority to attack down/left before to move
+		if (is_enemy(tree->_board, x + 1, y - 1, turn) == 1 && tree->_board[x + 1][y - 1] != 'K' && y != 0) { // Priority to attack down/left before to move
 			move_piece(tree, piece, x + 1, y - 1, number_move, turn);
 		}
 		if (square_is_free(tree->_board, x + 1, y) == true) { // If in front of the pawn, the square is free
@@ -987,25 +964,20 @@ int king_attacks_king (std::unique_ptr<Node>& tree, int x, int y, int& number_mo
 	return 0;
 }
 
-int ennemy_attacks_king (std::unique_ptr<Node>& tree, int x, int y, int& number_move, bool turn) {
+int enemy_attacks_king (std::unique_ptr<Node>& tree, int x, int y, int& number_move, bool turn) {
 	/*if (king_attacks_king(tree, x, y, number_move, turn) == 1) {
-		std::cout << "LE ROI ATTAQUE\n";
 		return 1;
 	}*/
 	if (rook_attacks_king(tree, x, y, number_move, turn) == 1) {
-		std::cout << "LA TOUR ATTAQUE\n";
 		return 1;
 	}
 	if (bishop_attacks_king(tree, x, y, number_move, turn) == 1) {
-		std::cout << "LE FOU ATTAQUE\n";
 		return 1;
 	}
 	if (knight_attacks_king(tree, x, y, number_move, turn) == 1) {
-		std::cout << "LE CAVALIER ATTAQUE\n";
 		return 1;
 	}
 	if (pawn_attacks_king(tree, x, y, number_move, turn) == 1) {
-		std::cout << "LE PION ATTAQUE\n";
 		return 1;
 	}
 	return 0;
@@ -1020,19 +992,16 @@ int moves_king (std::unique_ptr<Node>& tree, int x, int y, int& number_move, boo
 
 	x_initial_position = x;
 	y_initial_position = y;
-	std::cout << "ICI en x : " << x << ", y : " << y << "\n";
-	std::cout << "ICI en x_initial_position : " << x_initial_position << ", y_initial_position : " << y_initial_position << "\n";
 
-	ennemy_attacks_king(tree, x, y, number_move, turn);
+	enemy_attacks_king(tree, x, y, number_move, turn);
 
-	std::cout << "King haut\n";
 	if (x != 0) { // Moves up
 		tree->_board[x][y] = '.';
 		x -= 1;
-		// If there is no ennemy king in an adjacent square
+		// If there is no enemy king in an adjacent square
 		if (king_attacks_king(tree, x, y, number_move, turn) == 0) { 
 			move_piece(tree, piece, x, y, number_move, turn);
-			adjacent_check_square += ennemy_attacks_king(tree, x, y, number_move, turn);
+			adjacent_check_square += enemy_attacks_king(tree, x, y, number_move, turn);
 		}
 	} else {
 		max_adjacent_free_square--;
@@ -1040,8 +1009,6 @@ int moves_king (std::unique_ptr<Node>& tree, int x, int y, int& number_move, boo
 
 	x = x_initial_position;
 	y = y_initial_position;
-	std::cout << "King haut/droite\n";
-	std::cout << tree->_board[x][y] << " en x : " << x << ", y : " << y << "\n";
 
 	if (x != 0 && y != SIZE - 1) { // Moves up/right
 		tree->_board[x][y] = '.';
@@ -1049,7 +1016,7 @@ int moves_king (std::unique_ptr<Node>& tree, int x, int y, int& number_move, boo
 		y += 1;
 		if (king_attacks_king(tree, x, y, number_move, turn) == 0) { 
 			move_piece(tree, piece, x, y, number_move, turn);
-			adjacent_check_square += ennemy_attacks_king(tree, x, y, number_move, turn);
+			adjacent_check_square += enemy_attacks_king(tree, x, y, number_move, turn);
 		}
 	} else {
 		max_adjacent_free_square--;
@@ -1058,15 +1025,13 @@ int moves_king (std::unique_ptr<Node>& tree, int x, int y, int& number_move, boo
 
 	x = x_initial_position;
 	y = y_initial_position;
-	std::cout << "King droite\n";
 
 	if (y != SIZE - 1) { // Moves right
 		tree->_board[x][y] = '.';
 		y += 1;
-		std::cout << tree->_board[x][y] << " en x : " << x << ", y : " << y << "\n";
 		if (king_attacks_king(tree, x, y, number_move, turn) == 0) { 
 			move_piece(tree, piece, x, y, number_move, turn);
-			adjacent_check_square += ennemy_attacks_king(tree, x, y, number_move, turn);
+			adjacent_check_square += enemy_attacks_king(tree, x, y, number_move, turn);
 		}
 	} else {
 		max_adjacent_free_square--;
@@ -1075,17 +1040,14 @@ int moves_king (std::unique_ptr<Node>& tree, int x, int y, int& number_move, boo
 
 	x = x_initial_position;
 	y = y_initial_position;
-
-	std::cout << "King bas/droite\n";
 
 	if (x != SIZE - 1 && y != SIZE - 1) { // Moves right/down
 		tree->_board[x][y] = '.';
 		x += 1;
 		y += 1;
-		std::cout << tree->_board[x][y] << " en x : " << x << ", y : " << y << "\n";
 		if (king_attacks_king(tree, x, y, number_move, turn) == 0) { 
 			move_piece(tree, piece, x, y, number_move, turn);
-			adjacent_check_square += ennemy_attacks_king(tree, x, y, number_move, turn);
+			adjacent_check_square += enemy_attacks_king(tree, x, y, number_move, turn);
 		}
 	} else {
 		max_adjacent_free_square--;
@@ -1095,13 +1057,12 @@ int moves_king (std::unique_ptr<Node>& tree, int x, int y, int& number_move, boo
 	x = x_initial_position;
 	y = y_initial_position;
 
-	std::cout << "King bas\n";
 	if (x != SIZE - 1) { // Moves down
 		tree->_board[x][y] = '.';
 		x += 1;
 		if (king_attacks_king(tree, x, y, number_move, turn) == 0) { 
 			move_piece(tree, piece, x, y, number_move, turn);
-			adjacent_check_square += ennemy_attacks_king(tree, x, y, number_move, turn);
+			adjacent_check_square += enemy_attacks_king(tree, x, y, number_move, turn);
 		}
 	} else {
 		max_adjacent_free_square--;
@@ -1110,14 +1071,13 @@ int moves_king (std::unique_ptr<Node>& tree, int x, int y, int& number_move, boo
 	x = x_initial_position;
 	y = y_initial_position;
 
-	std::cout << "King bas/gauche\n";
 	if (x != SIZE - 1 && y != 0) { // Moves down/left
 		tree->_board[x][y] = '.';
 		x += 1;
 		y -= 1;
 		if (king_attacks_king(tree, x, y, number_move, turn) == 0) { 
 			move_piece(tree, piece, x, y, number_move, turn);
-			adjacent_check_square += ennemy_attacks_king(tree, x, y, number_move, turn);
+			adjacent_check_square += enemy_attacks_king(tree, x, y, number_move, turn);
 		}
 	} else {
 		max_adjacent_free_square--;
@@ -1126,13 +1086,12 @@ int moves_king (std::unique_ptr<Node>& tree, int x, int y, int& number_move, boo
 	x = x_initial_position;
 	y = y_initial_position;
 
-	std::cout << "King gauche\n";
 	if (y != 0) { // Moves left
 		tree->_board[x][y] = '.';
 		y -= 1;
 		if (king_attacks_king(tree, x, y, number_move, turn) == 0) { 
 			move_piece(tree, piece, x, y, number_move, turn);
-			adjacent_check_square += ennemy_attacks_king(tree, x, y, number_move, turn);
+			adjacent_check_square += enemy_attacks_king(tree, x, y, number_move, turn);
 		}
 	} else {
 		max_adjacent_free_square--;
@@ -1141,14 +1100,13 @@ int moves_king (std::unique_ptr<Node>& tree, int x, int y, int& number_move, boo
 	x = x_initial_position;
 	y = y_initial_position;
 
-	std::cout << "King haut/gauche\n";
 	if (x != 0 && y != 0) { // Moves left/up
 		tree->_board[x][y] = '.';
 		x -= 1;
 		y -= 1;
 		if (king_attacks_king(tree, x, y, number_move, turn) == 0) { 
 			move_piece(tree, piece, x, y, number_move, turn);
-			adjacent_check_square += ennemy_attacks_king(tree, x, y, number_move, turn);
+			adjacent_check_square += enemy_attacks_king(tree, x, y, number_move, turn);
 		}
 	} else {
 		max_adjacent_free_square--;
@@ -1159,7 +1117,6 @@ int moves_king (std::unique_ptr<Node>& tree, int x, int y, int& number_move, boo
 	tree->_board[x][y] = piece;
 
 	if (max_adjacent_free_square == adjacent_check_square) {
-		std::cout << "PEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEERDU\n";
 		if (turn == true) {
 			tree->_value -= INF;
 			lose = 1;
@@ -1169,153 +1126,57 @@ int moves_king (std::unique_ptr<Node>& tree, int x, int y, int& number_move, boo
 		}
 	}
 
-	std::cout << tree->_value << "\n";
-
 	return lose;
 }
-/*
-void select_piece (std::unique_ptr<Node>& tree, bool& turn) {
-	int i, j;
-	int number_move = 0;
-
-	if (turn == true) {
-
-		for (i = 0; i < SIZE; i++) {
-			for (j = 0; j < SIZE; j++) {
-				if (tree->_board[i][j] == 'P') {
-					std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
-					moves_pawn(tree, i, j, number_move, turn);
-				}
-				if (tree->_board[i][j] == 'R') {
-					std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
-					moves_rook(tree, i, j, number_move, turn);
-				}
-				if (tree->_board[i][j] == 'B') {
-					std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
-					moves_bishop(tree, i, j, number_move, turn);
-				}
-				if (tree->_board[i][j] == 'Q') {
-					std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
-					moves_queen(tree, i, j, number_move, turn);
-				}
-				if (tree->_board[i][j] == 'N') {
-					std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
-					moves_knight(tree, i, j, number_move, turn);
-				}
-				if (tree->_board[i][j] == 'K') {
-					std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
-					if (moves_king(tree, i, j, number_move, turn) == 1) {
-						break;
-					}
-				}
-			}
-		}
-		std::cout << tree->_value << "\n";
-		turn = false;
-	} else {
-
-		for (i = SIZE - 1; i >= 0; i--) {
-			for (j = 0; j < SIZE; j++) {
-				if (tree->_board[i][j] == 'p') {
-					std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
-					moves_pawn(tree, i, j, number_move, turn);
-				}
-				if (tree->_board[i][j] == 'r') {
-					std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
-					moves_rook(tree, i, j, number_move, turn);
-				}
-				if (tree->_board[i][j] == 'b') {
-					std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
-					moves_bishop(tree, i, j, number_move, turn);
-				}
-				if (tree->_board[i][j] == 'q') {
-					std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
-					moves_queen(tree, i, j, number_move, turn);
-				}
-				if (tree->_board[i][j] == 'n') {
-					std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
-					moves_knight(tree, i, j, number_move, turn);
-				}
-				if (tree->_board[i][j] == 'k') {
-					std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
-					if (moves_king(tree, i, j, number_move, turn) == 1) {
-						break;
-					}
-				}
-			}
-		}
-		std::cout << tree->_value << "\n";
-		turn = true;
-	}
-}
-*/
 
 int select_piece (std::unique_ptr<Node>& tree, int i, int j, int& number_move, bool& turn) {
-	//int i, j;
-	//int number_move = 0;
 
 	if (turn == true) {
-		
 		if (tree->_board[i][j] == 'P') {
-			std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
 			moves_pawn(tree, i, j, number_move, turn);
 		}
 		if (tree->_board[i][j] == 'R') {
-			std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
 			moves_rook(tree, i, j, number_move, turn);
 		}
 		if (tree->_board[i][j] == 'B') {
-			std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
 			moves_bishop(tree, i, j, number_move, turn);
 		}
 		if (tree->_board[i][j] == 'Q') {
-			std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
 			moves_queen(tree, i, j, number_move, turn);
 		}
 		if (tree->_board[i][j] == 'N') {
-			std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
 			moves_knight(tree, i, j, number_move, turn);
 		}
 		if (tree->_board[i][j] == 'K') {
-			std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
 			if (moves_king(tree, i, j, number_move, turn) == 1) {
 				return 1;
 			}
 		}
-		std::cout << tree->_value << "\n";
-		//turn = false;
-	} else {
 		
+	} else {
 		if (tree->_board[i][j] == 'p') {
-			std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
 			moves_pawn(tree, i, j, number_move, turn);
 		}
 		if (tree->_board[i][j] == 'r') {
-			std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
 			moves_rook(tree, i, j, number_move, turn);
 		}
 		if (tree->_board[i][j] == 'b') {
-			std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
 			moves_bishop(tree, i, j, number_move, turn);
 		}
 		if (tree->_board[i][j] == 'q') {
-			std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
 			moves_queen(tree, i, j, number_move, turn);
 		}
 		if (tree->_board[i][j] == 'n') {
-			std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
 			moves_knight(tree, i, j, number_move, turn);
 		}
 		if (tree->_board[i][j] == 'k') {
-			std::cout << tree->_board[i][j] << " en i(x) : " << i << ", j(y) : " << j << "\n";
 			if (moves_king(tree, i, j, number_move, turn) == 1) {
 				return 1;
 			}
 		}
-	
-		std::cout << tree->_value << "\n";
-		//turn = true;
+		
 	}
+	return 0;
 }
 
 int min (int a, int b) {
@@ -1330,138 +1191,163 @@ int max (int a, int b) {
 	return b;
 }
 
+int checkmate (std::unique_ptr<Node>& tree, int& number_move, bool& turn) {
+	int i, j;
+	char king;
+	if (turn == true) {
+		king = 'K';
+	} else {
+		king = 'k';
+	}
+	for (i = 0; i < SIZE; i++) {
+		for (j = 0; j < SIZE; j++) {
+			if (tree->_board[i][j] == king) {
+				if (enemy_attacks_king(tree, i, j, number_move, turn) == 1) {
+					return 1;
+				}
+			}
+		}
+	}
+	return 0;
+}
+
 int alphabeta (std::unique_ptr<Node>& tree, int number_move, bool turn, int depth, int alpha, int beta) {
 	int i, j, k;
 	int res = 0;
-	//number_move = 0;
 
+	initialized_next_nullptr (tree);
 
-	if (depth == 0) {
-		return 0;
-	}
+	if (depth == 0) // Victory condition
+		return tree->_value;
 
-	//if (tree) {
-		if (turn == false) { // Lowercase - alpha
-			res = INF;
-			for (i = 0; i < SIZE; i++) {
-				for (j = 0; j < SIZE; j++) {
-					if (tree->_board[i][j] != '.') {
-						select_piece (tree, i, j, number_move, turn);
-					}
+	if (turn == false) { // Lowercase - alpha
+		res = INF;
+		//if (checkmate(tree, number_move, turn) == 1)
+		//	return tree->_value + INF;
+		
+		for (i = 0; i < SIZE; i++) {
+			for (j = 0; j < SIZE; j++) {
+				if (tree->_board[i][j] != '.') {
+					select_piece (tree, i, j, number_move, turn);
 				}
-			}
-			//for (k = 0; k < number_move; k++) { 
-			for (k = 0; k < static_cast<int>(tree->_next.size()); k++) {
-				std::cout << "EST CE QUE JE PASSE ICI ???\n";
-				res = min(res, alphabeta(tree->_next[k], 0, true, depth - 1, alpha, beta));
-			
-				if (alpha >= res) {
-					return res;
-				}
-				beta = min(beta, res);
-				return beta;
-			}
-
-		} else {  // Uppercase - beta
-			res = -INF;
-			for (i = SIZE - 1; i >= 0; i--) {
-				for (j = 0; j < SIZE; j++) {
-					if (tree->_board[i][j] != '.') {
-						select_piece (tree, i, j, number_move, turn);
-					}
-				}
-			}
-			if (!tree->_board[0]) {
-				std::cout << "SOUS NOEUD VIDE\n";
-			} else {
-				std::cout << "SOUS NOEUD NON VIDE\n";
-				//print_board(tree->_next[0]->_board);
-			}
-			
-			//for (k = 0; k < number_move; k++) {
-			for (k = 0; k < static_cast<int>(tree->_next.size()); k++) {
-				std::cout << "PROFONDEUR : " << depth << "\n";
-
-				res = max(res, alphabeta(tree->_next[k], 0, false, depth - 1, alpha, beta));
-				std::cout << "RES : " << res << "\n";
-				if (res >= beta) {
-					return res;
-				}
-				alpha = max(alpha, res);
 			}
 		}
-	//}
+		for (k = 0; k < number_move; k++) {
+			res = min(res, alphabeta(tree->_next[k], 0, true, depth - 1, alpha, beta));
+			if (alpha >= res) {
+				return res;
+			}
+			beta = min(beta, res);
+			return beta;
+		}
 
-	
+	} else {  // Uppercase - beta
+		res = -INF;
+		//if (checkmate(tree, number_move, turn) == 1)
+		//	return tree->_value - INF;
 
+		for (i = SIZE - 1; i >= 0; i--) {
+			for (j = 0; j < SIZE; j++) {
+				if (tree->_board[i][j] != '.') {
+					select_piece (tree, i, j, number_move, turn);
+				}
+			}
+		}
+		for (k = 0; k < number_move; k++) {
+			res = max(res, alphabeta(tree->_next[k], 0, false, depth - 1, alpha, beta));
+			if (res >= beta) {
+				return res;
+			}
+			alpha = max(alpha, res);
+		}
+	}
 	return res;
 }
 
 void print_node (std::unique_ptr<Node>& tree) {
 	int i;
-	std::cout << tree.get() << "\n";
-	std::cout << tree->_next.size() << "\n";
-	std::cout << "Score : " << tree->_value << "\n";
 	if (tree) {
-		std::cout << "ICI\n";
+		std::cout << "Score : " << tree->_value << "\n";
 		print_board(tree->_board);
-		for (i = 0; i < static_cast<int>(tree->_next.size()); i++)
-			print_node(tree->_next[i]);
-	} else {
-		std::cout << "NULL \n";
+		for (i = 0; i < SIZE * SIZE; i++) {
+			if (tree->_next[i])
+				print_node(tree->_next[i]);
+		}
 	}
+}
+
+void select_problem (std::unique_ptr<Node>& tree) {
+	int n = 0;
+	std::cout << "Choose a problem (write between 0 to 4): \n";
+	std::cin >> n;
+	switch (n) {
+		case 0:
+			init_board(tree->_board);
+			break;
+		case 1:
+			add_piece(tree->_board, 'K', 3, 3);
+			add_piece(tree->_board, 'R', 3, 0);
+			add_piece(tree->_board, 'R', 4, 1);
+			add_piece(tree->_board, 'k', 0, 3);
+			break;
+		case 2:
+			add_piece(tree->_board, 'K', 3, 0);
+			add_piece(tree->_board, 'Q', 4, 2);
+			add_piece(tree->_board, 'R', 4, 1);
+			add_piece(tree->_board, 'k', 0, 3);
+			break;
+		case 3:
+			add_piece(tree->_board, 'K', 2, 3);
+			add_piece(tree->_board, 'B', 4, 2);
+			add_piece(tree->_board, 'B', 4, 1);
+			add_piece(tree->_board, 'p', 1, 3);
+			add_piece(tree->_board, 'k', 0, 3);
+			break;
+		case 4:
+			add_piece(tree->_board, 'K', 2, 0);
+			add_piece(tree->_board, 'N', 2, 4);
+			add_piece(tree->_board, 'N', 1, 1);
+			add_piece(tree->_board, 'b', 1, 3);
+			add_piece(tree->_board, 'k', 0, 3);
+			break;
+		default :
+			init_board(tree->_board);
+			break;
+	}
+
 }
 
 int main () {
 	std::unique_ptr<Node> tree;
-	if (!tree) {
-		std::cout << "tree is empty\n";
-	}
 	tree = std::make_unique<Node> ();
-	if (tree) {
-		std::cout << "tree is not empty\n";
-	}
-	//tree->_next.push_back(std::make_unique<Node> ());
-	//tree->_next[0] = nullptr;
+	int depth = 2;
 
 	bool turn = true;
 
 	create_board(tree->_board);
+	select_problem(tree);
 
 	//init_board(tree->_board);
 
-	add_piece(tree->_board, 'R', 1, 0);
-	add_piece(tree->_board, 'b', 2, 1);
-	
-	//add_piece(tree->_board, 'p', 1, 3);
-	add_piece(tree->_board, 'n', 0, 1);
-	//add_piece(tree->_board, 'K', 3, 1);
-	//add_piece(tree->_board, 'R', 4, 1);
+	//add_piece(tree->_board, 'k', 0, 2);
+	//add_piece(tree->_board, 'K', 4, 2);
 
 	print_board(tree->_board);
 
-	std::cout << "DEBUT DE LA SELECTION\n";
-	//tree->_value = calculate_value_board(tree);
-	//select_piece(tree, turn);
-	int res = alphabeta(tree, 0, turn, 3, -INF, INF);
+	int res = alphabeta(tree, 0, turn, depth, -INF, INF);
+	//std::cout << "Résultat : " << res << "\n";
+	
+	//std::cout << "///////////////////////////////////////\nDEBUT DU PRINT NODE\n";
 
-	std::cout << "///////////////////////////////////////\nDEBUT DU PRINT NODE\n";
-
-	if (tree) {
+	/*if (tree) {
 		tree->_value = calculate_value_board(tree);
 		print_node(tree);
 	} else {
 		tree->_value = calculate_value_board(tree);
 		print_board(tree->_board);
-	}
+	}*/
 
 	std::cout << "Résultat : " << res << "\n";
-
-	/*std::cout << tree->_next.size() << "\n";
-	create_board(tree->_next[0]->_board);
-	print_board(tree->_next[0]->_board);
-*/
-	//print_node(tree);
 
 	return 0;
 }
